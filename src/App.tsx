@@ -25,6 +25,7 @@ import {
   ChevronDown,
   ChevronRight,
   UserCircle,
+  Home,
   Stethoscope,
   TrendingUp,
   CreditCard,
@@ -1266,31 +1267,14 @@ export default function App() {
           </nav>
         </div>
 
-        <div className="p-8 bg-slate-50 shadow-[0_-1px_0_0_rgba(0,0,0,0.05)]">
-          <div className="mb-6">
-            <label className="text-[10px] font-black uppercase text-slate-400 px-1 mb-3 block">Simular Rol</label>
-            <div className="grid grid-cols-1 gap-1">
-              {(["ADMINISTRADOR", "RECEPCIÓN", "QUÍMICO", "INVENTARIO", "PACIENTE", "MÉDICO"] as UserRole[]).map(r => (
-                <button 
-                  key={r}
-                  onClick={() => { setCurrentRole(r); setActiveModule("Dashboard"); }}
-                  className={`text-[10px] font-black py-2 px-3 rounded-lg text-left transition-all ${
-                    currentRole === r ? "bg-perisur-blue text-white shadow-md shadow-blue-100" : "text-slate-400 hover:bg-white"
-                  }`}
-                >
-                  {r}
-                </button>
-              ))}
-            </div>
-          </div>
+        <div className="p-8 bg-slate-50 shadow-[0_-1px_0_0_rgba(0,0,0,0.05)] space-y-2">
           <button 
             onClick={() => setCurrentRole(null)}
-            className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl bg-perisur-blue/5 border border-perisur-blue/10 text-xs font-black text-perisur-blue hover:bg-perisur-blue hover:text-white transition-all mb-3"
+            className="flex items-center justify-center gap-2 w-full py-4 bg-perisur-blue text-white rounded-2xl text-xs font-black uppercase shadow-lg shadow-blue-100 hover:scale-[1.02] transition-all"
           >
-            <UserCircle className="w-4 h-4" />
-            Cambiar de Rol
+            <Home className="w-4 h-4" /> Regresar al Home
           </button>
-          <button className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl bg-white border border-slate-100 text-xs font-black text-slate-400 hover:text-red-500 hover:border-red-100 transition-all">
+          <button className="flex items-center justify-center gap-2 w-full py-4 bg-white border border-slate-100 text-xs font-black text-slate-400 hover:text-red-500 hover:border-red-100 transition-all uppercase">
             <LogOut className="w-4 h-4" />
             Salir del Sistema
           </button>
@@ -1376,32 +1360,17 @@ export default function App() {
                     ))}
                   </div>
                 </div>
-
-                <div>
-                  <p className="text-[10px] uppercase font-black text-slate-300 tracking-widest px-3 mb-4">Cambiar Perfil</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {(["ADMINISTRADOR", "RECEPCIÓN", "QUÍMICO", "INVENTARIO", "PACIENTE", "MÉDICO"] as UserRole[]).map(r => (
-                      <button 
-                        key={r}
-                        onClick={() => { setCurrentRole(r); setActiveModule("Dashboard"); setIsMobileMenuOpen(false); }}
-                        className={`text-[10px] font-black p-3 rounded-xl transition-all border ${currentRole === r ? "bg-perisur-blue text-white border-perisur-blue shadow-lg shadow-blue-100" : "text-slate-400 bg-slate-50 border-transparent"}`}
-                      >
-                        {r.charAt(0) + r.slice(1).toLowerCase()}
-                      </button>
-                    ))}
-                  </div>
-                </div>
               </div>
 
               <div className="mt-10 space-y-2">
                 <button 
                   onClick={() => { setCurrentRole(null); setIsMobileMenuOpen(false); }}
-                  className="w-full py-4 bg-perisur-blue/5 text-perisur-blue rounded-2xl text-xs font-black uppercase"
+                  className="w-full py-4 bg-perisur-blue text-white rounded-2xl text-xs font-black uppercase shadow-lg shadow-blue-100 flex items-center justify-center gap-2"
                 >
-                  Cambiar de Rol
+                  <Home className="w-4 h-4" /> Regresar al Home
                 </button>
                 <button className="w-full py-4 bg-slate-50 text-slate-400 rounded-2xl text-xs font-black uppercase flex items-center justify-center gap-2">
-                  <LogOut className="w-4 h-4" /> Salir
+                  <LogOut className="w-4 h-4" /> Salir del Sistema
                 </button>
               </div>
             </motion.aside>
