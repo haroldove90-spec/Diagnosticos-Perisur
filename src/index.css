@@ -3,6 +3,8 @@
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-perisur-blue: #0056b3;
+  --color-perisur-gray: #424242;
   --color-slate-50: #f8fafc;
   --color-slate-100: #f1f5f9;
   --color-slate-200: #e2e8f0;
