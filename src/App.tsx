@@ -28,10 +28,26 @@ import {
   Home,
   Stethoscope,
   TrendingUp,
+  TrendingDown,
   CreditCard,
   History,
   Info,
-  Settings
+  Settings,
+  Shield,
+  Gift,
+  Target,
+  MessageSquare,
+  Truck,
+  Star,
+  Bug,
+  Wrench,
+  QrCode,
+  Cpu,
+  FileSignature,
+  Map,
+  Mail,
+  AlertCircle,
+  ArrowDownToLine
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
@@ -44,7 +60,8 @@ import {
   ResponsiveContainer,
   Cell,
   LineChart,
-  Line
+  Line,
+  ReferenceLine
 } from "recharts";
 
 // --- Types ---
@@ -357,34 +374,49 @@ export default function App() {
       case "ADMINISTRADOR":
         return [
           { id: "Dashboard", label: "Dashboard Analítico", icon: <LayoutDashboard /> },
+          { id: "Auditoria", label: "Auditoría (Logs)", icon: <Shield /> },
+          { id: "Marketing", label: "Marketing y Lealtad", icon: <Gift /> },
+          { id: "Metas", label: "Metas Sucursal", icon: <Target /> },
           { id: "RRHH", label: "Recursos Humanos", icon: <Users /> },
           { id: "Finanzas", label: "Finanzas", icon: <DollarSign /> },
         ];
       case "RECEPCIÓN":
         return [
           { id: "Dashboard", label: "Registro Pacientes", icon: <Users /> },
+          { id: "Notificaciones", label: "Notificaciones Omnicanal", icon: <MessageSquare /> },
+          { id: "Maquila", label: "Recepción Maquila", icon: <Truck /> },
+          { id: "Satisfaccion", label: "Encuestas Satisfacción", icon: <Star /> },
           { id: "Caja", label: "Caja y Cotizaciones", icon: <CreditCard /> },
           { id: "Agenda", label: "Agenda Citas", icon: <Calendar /> },
         ];
       case "QUÍMICO":
         return [
           { id: "Dashboard", label: "Gestión de Muestras", icon: <FlaskConical /> },
+          { id: "Calidad", label: "Control de Calidad (QC)", icon: <Activity /> },
+          { id: "Microbiologia", label: "Microbiología", icon: <Bug /> },
+          { id: "Repeticiones", label: "Gestión de Repeticiones", icon: <History /> },
           { id: "Validacion", label: "Firma Digital", icon: <CheckCircle2 /> },
         ];
       case "INVENTARIO":
         return [
           { id: "Dashboard", label: "Control de Stock", icon: <Package /> },
+          { id: "Mantenimiento", label: "Mantenimiento Preventivo", icon: <Wrench /> },
+          { id: "Requisiciones", label: "Requisiciones Internas", icon: <ClipboardList /> },
           { id: "Caducidades", label: "Caducidades", icon: <AlertTriangle /> },
           { id: "Proveedores", label: "Proveedores", icon: <Users /> },
         ];
       case "PACIENTE":
         return [
           { id: "Dashboard", label: "Resultados Online", icon: <FileText /> },
+          { id: "PreRegistro", label: "Pre-registro QR", icon: <QrCode /> },
+          { id: "IAInterpretacion", label: "Interpretación IA", icon: <Cpu /> },
           { id: "Preparacion", label: "Preparación", icon: <Info /> },
         ];
       case "MÉDICO":
         return [
           { id: "Dashboard", label: "Seguimiento", icon: <Users /> },
+          { id: "Solicitud", label: "Solicitud Electrónica", icon: <FileSignature /> },
+          { id: "Epidemiologia", label: "Epidemiología Local", icon: <Map /> },
           { id: "Estadisticas", label: "Estadísticas Salud", icon: <TrendingUp /> },
         ];
       default:
@@ -438,6 +470,126 @@ export default function App() {
   const renderModule = () => {
     switch (currentRole) {
       case "ADMINISTRADOR":
+        if (activeModule === "Auditoria") {
+          return (
+            <div className="space-y-8 animate-in fade-in duration-500">
+               <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-xl font-black text-perisur-gray">Bitácora de Auditoría (Logs)</h3>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => alert("Generando reporte de auditoría en formato Excel/CSV...")}
+                      className="px-4 py-2 bg-slate-50 rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-slate-100 transition-colors"
+                    ><ArrowDownToLine className="w-4 h-4" /> Exportar</button>
+                    <button 
+                      onClick={() => alert("Abriendo filtros avanzados de auditoría...")}
+                      className="px-4 py-2 bg-perisur-blue text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-colors"
+                    >Filtro Avanzado</button>
+                  </div>
+                </div>
+                <div className="overflow-x-auto -mx-8 px-8">
+                  <div className="min-w-[600px] space-y-4">
+                    {[
+                      { user: "Jesús Armengol", action: "Modificó resultado Glucosa", patient: "PX-001", time: "14:22:10", ip: "189.210.34.12", risk: "low" },
+                      { user: "María Ortiz", action: "Eliminó registro de pago", patient: "PX-005", time: "13:45:05", ip: "189.210.34.15", risk: "high" },
+                      { user: "Carlos Pérez", action: "Liberó firma digital lote #44", patient: "N/A", time: "12:30:12", ip: "189.210.34.18", risk: "low" },
+                    ].map((log, i) => (
+                      <div key={i} className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl">
+                        <div className="flex items-center gap-6">
+                          <div className={`w-1 h-10 rounded-full ${log.risk === 'high' ? 'bg-red-500' : 'bg-green-500'}`} />
+                          <div>
+                            <p className="text-sm font-black text-perisur-gray">{log.user}</p>
+                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{log.action} • {log.patient}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[10px] font-black text-perisur-blue">{log.time}</p>
+                          <p className="text-[10px] text-slate-300 font-mono">IP: {log.ip}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        if (activeModule === "Marketing") {
+          return (
+            <div className="space-y-8 animate-in fade-in duration-500">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                  <h3 className="text-xl font-black text-perisur-gray mb-8">Programas de Lealtad</h3>
+                  <div className="space-y-6">
+                    <div className="p-6 bg-perisur-blue/5 rounded-3xl border border-perisur-blue/10">
+                      <p className="text-[10px] font-black text-perisur-blue uppercase mb-2">Campaña Activa</p>
+                      <h4 className="text-lg font-black text-perisur-gray mb-4">Check-up Primaveral</h4>
+                      <div className="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100">
+                        <p className="text-xs font-bold text-slate-500">20% Descuento en Perfil Bio</p>
+                        <span className="text-[10px] font-black text-perisur-blue">84 Canjeados</span>
+                      </div>
+                    </div>
+                    <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                      <p className="text-[10px] font-black text-slate-400 uppercase mb-4">Pacientes Frecuentes (VIP)</p>
+                      <div className="flex items-center gap-3">
+                        <div className="flex -space-x-3">
+                          {[1,2,3,4].map(i => <div key={i} className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white" />)}
+                        </div>
+                        <p className="text-xs font-bold text-slate-400">+128 pacientes Premium</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                  <h3 className="text-xl font-black text-perisur-gray mb-8">Seguimiento de Conversión</h3>
+                  <div className="h-48 flex items-end gap-3 justify-between">
+                    {[65, 45, 80, 55, 90, 70, 85].map((h, i) => (
+                      <div key={i} className="flex-1 rounded-t-xl bg-perisur-blue/20 relative group hover:bg-perisur-blue transition-all" style={{ height: `${h}%` }}>
+                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-perisur-gray text-white text-[10px] px-2 py-1 rounded font-black whitespace-nowrap">{h}% Conv.</div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-center text-slate-400 font-bold uppercase tracking-widest mt-6">Rendimiento Últimos 7 Días</p>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        if (activeModule === "Metas") {
+          return (
+            <div className="space-y-8 animate-in fade-in duration-500">
+               <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                <h3 className="text-xl font-black text-perisur-gray mb-10">Metas de Sucursal • Mayo 2026</h3>
+                <div className="space-y-12">
+                  {[
+                    { label: "Volumen de Ventas", current: "$450k", target: "$600k", progress: 75, color: "bg-perisur-blue" },
+                    { label: "Nuevos Pacientes", current: "1,240", target: "1,500", progress: 82, color: "bg-emerald-500" },
+                    { label: "Estudios Especializados", current: "84", target: "200", progress: 42, color: "bg-orange-500" },
+                  ].map((meta, i) => (
+                    <div key={i} className="space-y-4">
+                      <div className="flex justify-between items-end">
+                        <p className="font-black text-perisur-gray">{meta.label}</p>
+                        <p className="text-xs font-black text-slate-400">{meta.current} <span className="text-slate-300">/</span> {meta.target}</p>
+                      </div>
+                      <div className="w-full h-4 bg-slate-100 rounded-full overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${meta.progress}%` }}
+                          transition={{ duration: 1, ease: "easeOut" }}
+                          className={`h-full ${meta.color} rounded-full`} 
+                        />
+                      </div>
+                      <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{meta.progress}% Alcanzado</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
         if (activeModule === "RRHH") {
           return (
             <div className="space-y-8 animate-in fade-in duration-500">
@@ -644,6 +796,156 @@ export default function App() {
         );
 
       case "RECEPCIÓN":
+        if (activeModule === "Notificaciones") {
+          return (
+            <div className="space-y-8 animate-in fade-in duration-500">
+               <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm max-w-3xl">
+                <h3 className="text-xl font-black text-perisur-gray mb-8">Notificación de Resultados Omnicanal</h3>
+                <div className="space-y-6">
+                  {[
+                    { id: 1, patient: "Juan Pérez García", study: "Biometría Hemática", status: "Liberado", phone: "+52 55 1234 5678", email: "juan@example.com" },
+                    { id: 2, patient: "Sofía López Portillo", study: "Perfil Tiroideo", status: "Liberado", phone: "+52 55 8765 4321", email: "sofia@example.com" },
+                  ].map((notif, i) => (
+                    <div key={i} className="p-6 bg-slate-50 rounded-[2rem] border border-slate-100 flex items-center justify-between flex-wrap gap-4">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-black text-perisur-gray text-sm">{notif.patient}</p>
+                          <span className="text-[10px] font-black uppercase text-green-600 bg-green-100 px-2 py-0.5 rounded">Listo</span>
+                        </div>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase mb-4">{notif.study}</p>
+                        <div className="flex gap-4">
+                          <button 
+                            disabled={isDownloading}
+                            onClick={() => {
+                              setIsDownloading(true);
+                              setTimeout(() => {
+                                setIsDownloading(false);
+                                alert("¡WhatsApp enviado con éxito a " + notif.phone + "!");
+                              }, 1500);
+                            }}
+                            className="flex items-center gap-2 text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-2 rounded-xl hover:bg-emerald-100 transition-all disabled:opacity-50"
+                          >
+                             <MessageSquare className="w-3.5 h-3.5" /> {isDownloading ? "Enviando..." : "WhatsApp"}
+                          </button>
+                          <button 
+                            disabled={isDownloading}
+                            onClick={() => {
+                              setIsDownloading(true);
+                              setTimeout(() => {
+                                setIsDownloading(false);
+                                alert("Reporte enviado al correo: " + notif.email);
+                              }, 1500);
+                            }}
+                            className="flex items-center gap-2 text-[10px] font-black text-perisur-blue bg-blue-50 px-3 py-2 rounded-xl hover:bg-blue-100 transition-all disabled:opacity-50"
+                          >
+                             <Mail className="w-3.5 h-3.5" /> {isDownloading ? "Enviando..." : "E-mail"}
+                          </button>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                         <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Último Aviso</p>
+                         <p className="text-[10px] text-slate-400">Hace 2 horas</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        if (activeModule === "Maquila") {
+          return (
+            <div className="space-y-8 animate-in fade-in duration-500">
+              <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-xl font-black text-perisur-gray">Gestión de Maquila</h3>
+                  <button 
+                    onClick={() => setShowNewMaquilaModal(true)}
+                    className="px-5 py-2 bg-perisur-blue text-white rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-blue-700 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" /> Nueva Salida
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  {[
+                    { lab: "Laboratorios Centralizados", study: "TAMIZ METABOLICO", tracking: "TRK-847291-A", date: "Hoy 14:00" },
+                    { lab: "Genética Especializada", study: "ESTUDIO CITOGENETICO", tracking: "TRK-229381-C", date: "Ayer 10:30" },
+                  ].map((m, i) => (
+                    <div key={i} className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-perisur-blue shadow-sm">
+                          <Truck className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-black text-perisur-gray">{m.lab}</p>
+                          <p className="text-[10px] text-slate-400 font-bold uppercase">{m.study}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[10px] font-black text-perisur-blue mb-1">{m.tracking}</p>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Recolectado: {m.date}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        if (activeModule === "Satisfaccion") {
+          return (
+            <div className="space-y-8 animate-in fade-in duration-500">
+               <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm max-w-2xl mx-auto text-center">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-amber-50 rounded-[2.5rem] flex items-center justify-center text-amber-500 mx-auto mb-6">
+                  <Star className="w-8 h-8 sm:w-10 sm:h-10 fill-amber-500" />
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-perisur-gray mb-4">Encuesta de Satisfacción</h3>
+                <p className="text-xs sm:text-sm text-slate-400 mb-10 font-bold uppercase tracking-widest">¿Cómo calificaría su atención hoy?</p>
+                <div className="flex justify-center gap-2 sm:gap-4 mb-10">
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <button key={star} className="p-3 sm:p-6 bg-slate-50 rounded-2xl sm:rounded-3xl hover:bg-perisur-blue hover:text-white group transition-all border border-transparent hover:border-blue-100">
+                       <Star className="w-6 h-6 sm:w-10 sm:h-10 group-hover:fill-white text-perisur-blue transition-colors" />
+                       <span className="block mt-2 text-[10px] sm:text-xs font-black">{star}</span>
+                    </button>
+                  ))}
+                </div>
+                <button 
+                  onClick={() => alert("¡Gracias por su opinión! Hemos registrado su calificación.")}
+                  className="w-full py-4 sm:py-5 bg-perisur-gray text-white rounded-[2rem] text-[10px] sm:text-xs font-black uppercase tracking-widest shadow-xl shadow-slate-100"
+                >
+                  Finalizar Atención
+                </button>
+              </div>
+
+              <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm max-w-4xl mx-auto">
+                <h3 className="text-lg font-black text-perisur-gray mb-6">Resultados Recientes</h3>
+                <div className="space-y-4">
+                  {[
+                    { patient: "A. García", rating: 5, comment: "Excelente atención y rapidez.", date: "Hoy" },
+                    { patient: "M. Soto", rating: 4, comment: "Todo bien, solo un poco de espera en caja.", date: "Ayer" },
+                    { patient: "L. Mendoza", rating: 5, comment: "Muy profesionales los químicos.", date: "03 May" }
+                  ].map((rev, i) => (
+                    <div key={i} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-slate-50 rounded-2xl gap-2">
+                      <div className="flex items-center gap-3">
+                        <div className="flex gap-0.5">
+                          {Array.from({ length: 5 }).map((_, idx) => (
+                            <Star key={idx} className={`w-3 h-3 ${idx < rev.rating ? 'text-amber-400 fill-amber-400' : 'text-slate-200'}`} />
+                          ))}
+                        </div>
+                        <p className="text-xs font-black text-perisur-gray">{rev.patient}</p>
+                      </div>
+                      <p className="text-xs text-slate-500 italic">"{rev.comment}"</p>
+                      <p className="text-[10px] font-bold text-slate-300 uppercase">{rev.date}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
         if (activeModule === "Caja") {
           return (
             <div className="space-y-8 animate-in fade-in duration-500">
@@ -764,41 +1066,43 @@ export default function App() {
           return (
             <div className="space-y-8 animate-in fade-in duration-500">
               <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
                   <h3 className="text-xl font-black text-perisur-gray">Agenda de Citas y Tomas</h3>
-                  <div className="flex gap-2">
-                    <button className="px-5 py-2.5 bg-slate-50 rounded-xl text-[10px] font-black uppercase text-slate-400 hover:text-perisur-blue transition-colors">Hoy</button>
+                  <div className="flex gap-2 w-full sm:w-auto">
+                    <button className="flex-1 sm:flex-none px-5 py-2.5 bg-slate-50 rounded-xl text-[10px] font-black uppercase text-slate-400 hover:text-perisur-blue transition-colors">Hoy</button>
                     <button 
                       onClick={() => setShowNewAppointmentModal(true)}
-                      className="px-5 py-2.5 bg-perisur-blue text-white rounded-xl text-[10px] font-black uppercase shadow-lg shadow-blue-100 hover:scale-[1.05] transition-all flex items-center gap-2"
+                      className="flex-1 sm:flex-none px-5 py-2.5 bg-perisur-blue text-white rounded-xl text-[10px] font-black uppercase shadow-lg shadow-blue-100 hover:scale-[1.05] transition-all flex items-center justify-center gap-2"
                     >
                       <Plus className="w-4 h-4" /> Nueva Cita
                     </button>
                   </div>
                 </div>
-                <div className="space-y-4">
-                  {[
-                    { time: "09:00 AM", patient: "Lucía Torres", study: "Domicilio", status: "Confirmado" },
-                    { time: "10:30 AM", patient: "Eduardo Ruiz", study: "Sucursal", status: "En Camino" },
-                    { time: "11:15 AM", patient: "Rosa Ibarra", study: "Sucursal", status: "Pendiente" },
-                  ].map((cite, i) => (
-                    <div key={i} className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl group hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-slate-100">
-                      <div className="flex items-center gap-6">
-                        <div className="text-center w-24">
-                          <p className="text-sm font-black text-perisur-blue">{cite.time}</p>
-                          <p className="text-[9px] font-bold text-slate-300 uppercase">05 MAY 2026</p>
+                <div className="overflow-x-auto -mx-8 px-8">
+                  <div className="min-w-[600px] space-y-4">
+                    {[
+                      { time: "09:00 AM", patient: "Lucía Torres", study: "Domicilio", status: "Confirmado" },
+                      { time: "10:30 AM", patient: "Eduardo Ruiz", study: "Sucursal", status: "En Camino" },
+                      { time: "11:15 AM", patient: "Rosa Ibarra", study: "Sucursal", status: "Pendiente" },
+                    ].map((cite, i) => (
+                      <div key={i} className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl group hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-slate-100">
+                        <div className="flex items-center gap-6">
+                          <div className="text-center w-24">
+                            <p className="text-sm font-black text-perisur-blue">{cite.time}</p>
+                            <p className="text-[9px] font-bold text-slate-300 uppercase">05 MAY 2026</p>
+                          </div>
+                          <div className="w-px h-10 bg-slate-200" />
+                          <div>
+                            <p className="text-sm font-black text-perisur-gray">{cite.patient}</p>
+                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{cite.study}</p>
+                          </div>
                         </div>
-                        <div className="w-px h-10 bg-slate-200" />
-                        <div>
-                          <p className="text-sm font-black text-perisur-gray">{cite.patient}</p>
-                          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{cite.study}</p>
-                        </div>
+                        <span className={`text-[10px] font-black px-4 py-1.5 rounded-full ${cite.status === 'Confirmado' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
+                          {cite.status}
+                        </span>
                       </div>
-                      <span className={`text-[10px] font-black px-4 py-1.5 rounded-full ${cite.status === 'Confirmado' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
-                        {cite.status}
-                      </span>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -849,8 +1153,8 @@ export default function App() {
                   />
                 </div>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
+              <div className="overflow-x-auto -mx-8 px-8">
+                <table className="w-full text-left min-w-[800px]">
                   <thead className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                     <tr>
                       <th className="px-8 py-4">Expediente</th>
@@ -919,6 +1223,126 @@ export default function App() {
         );
 
       case "QUÍMICO":
+        if (activeModule === "Calidad") {
+          return (
+            <div className="space-y-8 animate-in fade-in duration-500">
+               <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                <h3 className="text-xl font-black text-perisur-gray mb-10">Control de Calidad Diario (QC)</h3>
+                <div className="h-64 mb-10 border-b border-slate-50">
+                   <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={[
+                      { x: 1, val: 98 }, { x: 2, val: 102 }, { x: 3, val: 95 }, 
+                      { x: 4, val: 105 }, { x: 5, val: 110 }, { x: 6, val: 97 }, 
+                      { x: 7, val: 100 }, { x: 8, val: 92 }, { x: 9, val: 103 }
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                      <XAxis hide />
+                      <YAxis domain={[80, 120]} />
+                      <ReferenceLine y={100} stroke="#3b82f6" strokeWidth={2} label={{ position: 'right', value: 'Media', fill: '#3b82f6', fontSize: 10 }} />
+                      <ReferenceLine y={110} stroke="#f59e0b" strokeDasharray="5 5" />
+                      <ReferenceLine y={90} stroke="#f59e0b" strokeDasharray="5 5" />
+                      <ReferenceLine y={120} stroke="#ef4444" strokeDasharray="5 5" />
+                      <ReferenceLine y={80} stroke="#ef4444" strokeDasharray="5 5" />
+                      <Line type="monotone" dataKey="val" stroke="#000" strokeWidth={3} dot={{ r: 5, fill: "#000" }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    { label: "Glucosa LVJ", status: "OK", sd: "0.8" },
+                    { label: "Colesterol LVJ", status: "OK", sd: "1.2" },
+                    { label: "Triglicéridos LVJ", status: "Alerta 1S", sd: "2.1" },
+                    { label: "Ácido Úrico LVJ", status: "OK", sd: "0.5" },
+                  ].map((qc, i) => (
+                    <div key={i} className="p-4 bg-slate-50 rounded-2xl">
+                      <p className="text-[10px] font-black text-perisur-gray uppercase mb-1">{qc.label}</p>
+                      <div className="flex justify-between items-center">
+                        <span className={`text-[10px] font-black px-2 py-0.5 rounded ${qc.status === 'OK' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>{qc.status}</span>
+                        <p className="text-[10px] font-mono font-bold text-slate-400">{qc.sd} SD</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button 
+                  onClick={() => alert("Registrando corrida de calidad... Los resultados se reflejarán en las gráficas de Levey-Jennings.")}
+                  className="w-full py-4 mt-8 bg-perisur-blue text-white rounded-2xl text-xs font-black uppercase hover:bg-blue-700 transition-all"
+                >
+                  Registrar Corrida de Calidad
+                </button>
+              </div>
+            </div>
+          );
+        }
+
+        if (activeModule === "Microbiologia") {
+          return (
+            <div className="space-y-8 animate-in fade-in duration-500">
+               <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                <h3 className="text-xl font-black text-perisur-gray mb-8">Gestión de Cultivos y Antibiogramas</h3>
+                <div className="space-y-4">
+                  {[
+                    { patient: "Ismael Vega", sample: "Urocultivo", day: "2", status: "Crecimiento Detectado", info: "Posible E. Coli" },
+                    { patient: "Carmen Solis", sample: "Exudado Faríngeo", day: "1", status: "Sin Crecimiento", info: "Incubando 37°C" },
+                  ].map((c, i) => (
+                    <div key={i} className="p-6 bg-slate-50 rounded-[2.5rem] border border-slate-100 flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-perisur-blue shadow-lg rounded-2xl flex items-center justify-center text-white"><Bug className="w-6 h-6" /></div>
+                        <div>
+                          <p className="font-black text-perisur-gray text-sm">{c.patient}</p>
+                          <p className="text-[10px] text-slate-400 font-bold uppercase">{c.sample}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-8">
+                         <div className="text-center">
+                            <p className="text-[10px] font-black text-slate-300 uppercase mb-1">Día Incubación</p>
+                            <p className="text-sm font-black text-perisur-blue">{c.day}</p>
+                         </div>
+                         <div className="text-right">
+                           <span className={`text-[10px] font-black px-3 py-1 rounded-full ${c.status.includes('Detectado') ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
+                             {c.status}
+                           </span>
+                           <p className="text-[10px] text-slate-400 mt-2 font-medium">{c.info}</p>
+                         </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        if (activeModule === "Repeticiones") {
+          return (
+            <div className="space-y-8 animate-in fade-in duration-500">
+               <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                <h3 className="text-xl font-black text-perisur-gray mb-8">Control Interno de Repeticiones y Mermas</h3>
+                <div className="space-y-4">
+                   {[
+                    { reason: "Muestra Hemolizada", count: 12, cost: "$580.00", trend: "+2%" },
+                    { reason: "Dilución Insuficiente", count: 8, cost: "$340.00", trend: "-10%" },
+                    { reason: "Valor Incoherente", count: 15, cost: "$1,100.00", trend: "0%" },
+                   ].map((m, i) => (
+                     <div key={i} className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl group hover:bg-white transition-all border border-transparent hover:border-slate-100">
+                        <div>
+                           <p className="text-sm font-black text-perisur-gray">{m.reason}</p>
+                           <p className="text-[10px] text-slate-400 font-bold uppercase">{m.count} Eventos en el Mes</p>
+                        </div>
+                        <div className="flex items-center gap-6">
+                           <div className="text-right">
+                              <p className="text-xs font-black text-perisur-gray">Costo Merma</p>
+                              <p className="text-[10px] text-red-400 font-black tracking-widest">{m.cost} MXN</p>
+                           </div>
+                           <TrendingDown className="w-5 h-5 text-red-200" />
+                        </div>
+                     </div>
+                   ))}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
         if (activeModule === "Validacion") {
           return (
             <div className="space-y-8 animate-in fade-in duration-500">
@@ -1035,6 +1459,82 @@ export default function App() {
         );
 
       case "INVENTARIO":
+        if (activeModule === "Mantenimiento") {
+          return (
+            <div className="space-y-8 animate-in fade-in duration-500">
+               <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                <h3 className="text-xl font-black text-perisur-gray mb-8">Mantenimiento de Activos Fijos</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[
+                    { asset: "Analizador Bioq. Siemens", next: "15 Mayo", status: "Vigente", color: "bg-green-100 text-green-700" },
+                    { asset: "Frigo #2 (Biológicos)", next: "Hoy", status: "URGENTE", color: "bg-red-100 text-red-700 shadow-lg shadow-red-50" },
+                    { asset: "Centrifuga Clinica B", next: "28 Mayo", status: "Vigente", color: "bg-green-100 text-green-700" },
+                  ].map((a, i) => (
+                    <div key={i} className="p-6 bg-slate-50 rounded-[2rem] border border-slate-100 group hover:scale-[1.02] transition-all">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="p-3 bg-white rounded-2xl shadow-sm text-perisur-blue"><Wrench className="w-5 h-5" /></div>
+                        <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase ${a.color}`}>{a.status}</span>
+                      </div>
+                      <h4 className="font-black text-perisur-gray text-sm mb-1">{a.asset}</h4>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Próxima Fecha: {a.next}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        if (activeModule === "Requisiciones") {
+          return (
+            <div className="space-y-8 animate-in fade-in duration-500">
+               <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-xl font-black text-perisur-gray">Requisiciones Internas Digitales</h3>
+                  <div className="flex bg-slate-50 p-1 rounded-xl">
+                    <button className="px-4 py-2 bg-white rounded-lg text-[10px] font-black uppercase shadow-sm">Pendientes (4)</button>
+                    <button className="px-4 py-2 text-[10px] font-black uppercase text-slate-300">Surtidas</button>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                   {[
+                    { source: "Área de Químicos", items: "Tiras Reactivas (20), Tubos EDTA (50)", priority: "Normal", time: "10:15 AM" },
+                    { source: "Microbiología", items: "Cajas de Petri (100), Agar Sangre (50)", priority: "Urgente", time: "09:30 AM" },
+                  ].map((req, i) => (
+                    <div key={i} className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl group hover:border-blue-100 border border-transparent transition-all">
+                      <div className="flex items-center gap-4">
+                        <input type="checkbox" className="w-5 h-5 accent-perisur-blue rounded-lg border-slate-300" defaultChecked />
+                        <div className="w-12 h-12 bg-white rounded-[1.5rem] flex items-center justify-center text-perisur-blue shadow-sm"><ClipboardList className="w-6 h-6" /></div>
+                        <div>
+                          <p className="text-sm font-black text-perisur-gray">{req.source}</p>
+                          <p className="text-[10px] text-slate-400 font-bold max-w-sm">{req.items}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                         <span className={`text-[10px] font-black px-3 py-1 rounded-full ${req.priority === 'Urgente' ? 'bg-red-100 text-red-700 animate-pulse' : 'bg-slate-200 text-slate-600'}`}>{req.priority}</span>
+                         <p className="text-[10px] text-slate-400 mt-2 font-mono">{req.time}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button 
+                  disabled={isDownloading}
+                  onClick={() => {
+                    setIsDownloading(true);
+                    setTimeout(() => {
+                      setIsDownloading(false);
+                      alert("¡Material liberado del almacén! Valide la recepción física con el área solicitante.");
+                    }, 2000);
+                  }}
+                  className="w-full py-4 mt-8 bg-perisur-blue text-white rounded-3xl text-sm font-black uppercase tracking-widest shadow-xl shadow-blue-100 disabled:opacity-50"
+                >
+                  {isDownloading ? "REGISTRANDO SALIDA..." : "Liberar Material Seleccionado"}
+                </button>
+              </div>
+            </div>
+          );
+        }
+
         if (activeModule === "Caducidades") {
           return (
             <div className="space-y-8 animate-in fade-in duration-500">
@@ -1122,8 +1622,8 @@ export default function App() {
                     <button className="p-2.5 bg-slate-50 rounded-xl"><Plus className="w-5 h-5 text-slate-400" /></button>
                   </div>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left">
+                <div className="overflow-x-auto -mx-8 px-8">
+                  <table className="w-full text-left min-w-[700px]">
                     <thead className="bg-slate-50/50 text-[10px] font-black text-slate-400 uppercase tracking-widest px-8">
                       <tr>
                         <th className="px-8 py-4">Insumo</th>
@@ -1184,6 +1684,85 @@ export default function App() {
         );
 
       case "PACIENTE":
+        if (activeModule === "PreRegistro") {
+          return (
+            <div className="space-y-8 animate-in fade-in duration-500">
+               <div className="bg-white p-12 rounded-[3.5rem] border border-slate-100 shadow-sm max-w-md mx-auto text-center border-b-8 border-b-perisur-blue">
+                <div className="w-24 h-24 bg-slate-50 flex items-center justify-center rounded-[2rem] mx-auto mb-10 shadow-inner overflow-hidden">
+                  {isDownloading ? (
+                    <motion.div 
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="w-20 h-20 bg-white p-2 rounded-xl border border-slate-100"
+                    >
+                      <QrCode className="w-full h-full text-perisur-gray" />
+                    </motion.div>
+                  ) : (
+                    <QrCode className="w-16 h-16 text-slate-200" />
+                  )}
+                </div>
+                <h3 className="text-2xl font-black text-perisur-gray mb-2">Pase Express QR</h3>
+                <p className="text-sm text-slate-400 mb-8 font-medium italic">De clic para generar su código y ahorrar tiempo en recepción.</p>
+                <div className="p-8 bg-perisur-blue/5 rounded-3xl border border-dashed border-perisur-blue/20 mb-8">
+                  <p className="text-[11px] font-black text-perisur-blue uppercase leading-relaxed tracking-wider">Muestre este código al llegar a su sucursal de Perisur para un registro inmediato.</p>
+                </div>
+                <button 
+                   disabled={isDownloading}
+                   onClick={() => {
+                     setIsDownloading(true);
+                     setTimeout(() => {
+                       alert("¡Código QR generado con éxito! Puede descargarlo o presentarlo directamente en tableta.");
+                     }, 1000);
+                   }}
+                   className="w-full py-5 bg-perisur-blue text-white rounded-[2rem] font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-50"
+                >
+                   {isDownloading ? "GENERANDO..." : "Generar Mi QR"}
+                </button>
+              </div>
+            </div>
+          );
+        }
+
+        if (activeModule === "IAInterpretacion") {
+          return (
+            <div className="space-y-8 animate-in fade-in duration-500">
+               <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm overflow-hidden border-t-8 border-t-emerald-500">
+                <div className="flex items-center gap-4 mb-10">
+                   <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 border border-emerald-100 shadow-sm animate-pulse">
+                     <Cpu className="w-8 h-8" />
+                   </div>
+                   <div>
+                     <h3 className="text-xl font-black text-perisur-gray">Explicación Simplificada (IA)</h3>
+                     <p className="text-[10px] text-emerald-600 font-black uppercase tracking-widest leading-none">Powered by Gemini Medical Insights</p>
+                   </div>
+                </div>
+                <div className="space-y-8">
+                   <div className="space-y-4">
+                     <h4 className="font-black text-perisur-gray flex items-center gap-2">
+                       <CheckCircle2 className="w-5 h-5 text-emerald-500" /> Glucosa 95 mg/dL
+                     </h4>
+                     <p className="text-sm border-l-4 border-emerald-500 pl-4 py-2 bg-slate-50/50 rounded-r-2xl leading-relaxed text-slate-600 italic">
+                        "Sus niveles de glucosa están en rangos óptimos. Esto indica un excelente metabolismo del azúcar en sangre de acuerdo a un ayuno de 12h."
+                     </p>
+                   </div>
+                   <div className="space-y-4">
+                     <h4 className="font-black text-perisur-gray flex items-center gap-2">
+                       <AlertCircle className="w-5 h-5 text-amber-500" /> Colesterol Total 240 mg/dL
+                     </h4>
+                     <p className="text-sm border-l-4 border-amber-500 pl-4 py-2 bg-slate-50/50 rounded-r-2xl leading-relaxed text-slate-600 italic">
+                        "Detectamos una leve elevación en grasas. No es crítico, pero le sugerimos reducir el consumo de alimentos procesados y llevar este reporte a su cardiólogo pronto."
+                     </p>
+                   </div>
+                </div>
+                <div className="mt-12 p-6 bg-perisur-gray rounded-3xl text-white">
+                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-300 mb-2">Nota Importante</p>
+                   <p className="text-[10px] italic leading-relaxed text-slate-100 opacity-80">Esta interpretación es informativa y no sustituye un diagnóstico médico. Siempre consulte a su especialista antes de tomar decisiones sobre su salud.</p>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
         if (activeModule === "Preparacion") {
           return (
             <div className="space-y-8 animate-in fade-in duration-500">
@@ -1289,6 +1868,68 @@ export default function App() {
         );
 
       case "MÉDICO":
+        if (activeModule === "Solicitud") {
+          return (
+            <div className="space-y-8 animate-in fade-in duration-500">
+               <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                <h3 className="text-xl font-black text-perisur-gray mb-8">Nueva Solicitud de Laboratorio Digital</h3>
+                <div className="space-y-6">
+                   <div className="grid grid-cols-2 gap-6">
+                      <div>
+                         <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 mb-2 block">Nombre del Paciente</label>
+                         <input type="text" placeholder="Ej: Pedro Infante" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold" />
+                      </div>
+                      <div>
+                         <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 mb-2 block">Cédula del Médico</label>
+                         <input type="text" disabled defaultValue="MED-847291" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold opacity-60" />
+                      </div>
+                   </div>
+                   <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Estudios Solicitados</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {["QUIMICA 6", "BIOMETRIA", "EGO", "PERFIL LIPIDOS", "COPRO", "ANTIGENO PSA"].map(study => (
+                          <button key={study} className="p-3 bg-white border border-slate-200 rounded-xl text-[9px] font-black hover:border-perisur-blue hover:text-perisur-blue transition-all uppercase">{study}</button>
+                        ))}
+                      </div>
+                   </div>
+                   <button 
+                     onClick={() => alert("Solicitud digital enviada. El paciente puede acudir a cualquier sucursal Perisur.")}
+                     className="w-full py-5 bg-perisur-blue text-white rounded-3xl text-sm font-black uppercase tracking-widest shadow-xl shadow-blue-100"
+                   >
+                     Generar Orden Electrónica <FileSignature className="w-4 h-4 ml-2 inline-block" />
+                   </button>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        if (activeModule === "Epidemiologia") {
+          return (
+            <div className="space-y-8 animate-in fade-in duration-500">
+               <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden">
+                <h3 className="text-xl font-black text-perisur-gray mb-8">Epidemiología Local • Mapa de Calor</h3>
+                <div className="grid grid-cols-10 gap-1 h-64 mb-8">
+                   {Array.from({length: 100}).map((_, i) => {
+                     const intensity = i % 7 === 0 ? "bg-red-500/80" : i % 5 === 0 ? "bg-amber-400/60" : "bg-emerald-400/20";
+                     return <div key={i} className={`rounded-sm ${intensity} hover:scale-110 transition-transform cursor-pointer`} />
+                   })}
+                </div>
+                <div className="flex justify-between items-center bg-slate-50 p-6 rounded-3xl">
+                   <div className="space-y-1">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Patología Prevalente</p>
+                      <p className="font-black text-perisur-gray">Diabetes Tipo II (+15%)</p>
+                   </div>
+                   <div className="space-y-1 text-right">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Zona Crítica</p>
+                      <p className="font-black text-red-500">Perisur SurEste</p>
+                   </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
         if (activeModule === "Estadisticas") {
           return (
             <div className="space-y-8 animate-in fade-in duration-500">
@@ -1330,11 +1971,11 @@ export default function App() {
 
             <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
                <div className="p-8 border-b border-slate-50">
-                  <h2 className="text-xl font-black text-perisur-gray">Pacientes Refiridos</h2>
+                  <h2 className="text-xl font-black text-perisur-gray">Pacientes Referidos</h2>
                   <p className="text-sm text-slate-400">Seguimiento de resultados de población asignada</p>
                </div>
-               <div className="overflow-x-auto">
-                  <table className="w-full text-left">
+               <div className="overflow-x-auto -mx-8 px-8">
+                  <table className="w-full text-left min-w-[700px]">
                     <thead className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest px-8">
                       <tr>
                         <th className="px-8 py-4">Paciente</th>
@@ -1422,37 +2063,37 @@ export default function App() {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-24 bg-white/80 backdrop-blur-md border-b border-slate-100 px-8 flex items-center justify-between sticky top-0 z-10">
-          <div className="flex items-center gap-4">
-            <button className="lg:hidden p-3 bg-slate-50 rounded-xl" onClick={() => setIsMobileMenuOpen(true)}>
-              <Menu className="w-6 h-6 text-perisur-blue" />
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+        <header className="h-20 sm:h-24 bg-white/80 backdrop-blur-md border-b border-slate-100 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-10">
+          <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
+            <button className="lg:hidden p-2 sm:p-3 bg-slate-50 rounded-xl" onClick={() => setIsMobileMenuOpen(true)}>
+              <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-perisur-blue" />
             </button>
-            <div className="lg:hidden flex items-center">
-              <img src="https://cossma.com.mx/diagnosticos.png" alt="Logo" className="h-10 object-contain mr-2" />
+            <div className="lg:hidden flex items-center flex-shrink-0">
+              <img src="https://cossma.com.mx/diagnosticos.png" alt="Logo" className="h-8 sm:h-10 object-contain mr-2" />
             </div>
-            <div>
-              <h2 className="text-xl font-black text-perisur-gray uppercase tracking-tight">{currentRole as string}</h2>
-              <div className="flex items-center gap-2 text-[10px] font-bold text-slate-300 uppercase tracking-widest mt-1">
-                <span>Perisur</span>
-                <ChevronRight className="w-2.5 h-2.5" />
+            <div className="overflow-hidden">
+              <h2 className="text-sm sm:text-xl font-black text-perisur-gray uppercase tracking-tight truncate">{currentRole as string}</h2>
+              <div className="flex items-center gap-1 sm:gap-2 text-[8px] sm:text-[10px] font-bold text-slate-300 uppercase tracking-widest mt-0.5 sm:mt-1">
+                <span className="hidden xs:inline">Perisur</span>
+                <ChevronRight className="w-2 sm:w-2.5 h-2 sm:h-2.5 hidden xs:inline" />
                 <span className="text-perisur-blue">{(currentRole as string).charAt(0) + (currentRole as string).slice(1).toLowerCase()}</span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <button className="p-3 hover:bg-slate-50 rounded-2xl relative text-slate-400 hover:text-perisur-blue transition-all">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-4 border-white shadow-sm"></span>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <button className="p-2 sm:p-3 hover:bg-slate-50 rounded-2xl relative text-slate-400 hover:text-perisur-blue transition-all">
+              <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="absolute top-2.5 sm:top-3 right-2.5 sm:right-3 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-red-500 rounded-full border-2 sm:border-4 border-white shadow-sm"></span>
             </button>
-            <div className="h-10 w-px bg-slate-100" />
-            <div className="flex items-center gap-3">
-              <div className="text-right hidden sm:block">
+            <div className="h-8 sm:h-10 w-px bg-slate-100" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="text-right hidden md:block">
                 <p className="text-sm font-black text-slate-900 leading-none">Jesús Armengol</p>
                 <p className="text-[10px] font-black text-perisur-blue uppercase tracking-wider mt-1">{currentRole as string}</p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-500 to-perisur-blue flex items-center justify-center text-white font-black shadow-lg shadow-blue-100">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-blue-500 to-perisur-blue flex items-center justify-center text-white font-black shadow-lg shadow-blue-100 flex-shrink-0">
                 JA
               </div>
             </div>
@@ -1581,32 +2222,96 @@ export default function App() {
           </div>
         )}
 
+        {/* Modal Nueva Salida Maquila */}
+        {showNewMaquilaModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-perisur-gray/40 backdrop-blur-sm">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative">
+              <button onClick={() => setShowNewMaquilaModal(false)} className="absolute top-6 right-6 p-2 bg-slate-50 rounded-full"><X className="w-5 h-5 text-slate-400" /></button>
+              <h3 className="text-xl font-black text-perisur-gray mb-6">Nueva Salida a Maquila</h3>
+              
+              <div className="space-y-4 mb-8">
+                <div>
+                  <label className="text-[10px] font-black text-slate-300 uppercase block mb-1">Destino</label>
+                  <select className="w-full p-4 bg-slate-50 rounded-2xl border-none text-xs font-bold text-perisur-gray">
+                    <option>Laboratorios Centralizados</option>
+                    <option>Genética Especializada</option>
+                    <option>Patología Integral</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] font-black text-slate-300 uppercase block mb-1">Muestras / Lote</label>
+                  <input type="text" placeholder="Ej: 15 Tubos EDTA, 5 Frascos" className="w-full p-4 bg-slate-50 rounded-2xl border-none text-xs font-bold text-perisur-gray" />
+                </div>
+              </div>
+
+              <button 
+                onClick={() => { 
+                  setIsDownloading(true);
+                  setTimeout(() => {
+                    alert("Salida a Maquila registrada con éxito."); 
+                    setIsDownloading(false);
+                    setShowNewMaquilaModal(false); 
+                  }, 1500);
+                }} 
+                className="w-full py-4 bg-perisur-blue text-white rounded-2xl text-[10px] font-black uppercase shadow-lg shadow-blue-100"
+              >
+                {isDownloading ? "REGISTRANDO..." : "Registrar Salida"}
+              </button>
+            </motion.div>
+          </div>
+        )}
+
         {/* Modal Nueva Cita Agenda */}
         {showNewAppointmentModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-perisur-gray/40 backdrop-blur-sm">
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-white rounded-3xl p-10 max-w-xl w-full shadow-2xl relative">
-              <button onClick={() => setShowNewAppointmentModal(false)} className="absolute top-6 right-6 p-2 bg-slate-50 rounded-full"><X className="w-5 h-5 text-slate-400" /></button>
-              <h3 className="text-2xl font-black text-perisur-gray mb-1 text-center">Programar Cita</h3>
-              <p className="text-sm text-slate-400 mb-8 font-medium text-center italic">Seleccione fecha y hora disponible</p>
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-white rounded-3xl p-6 sm:p-10 max-w-xl w-full shadow-2xl relative max-h-[90vh] overflow-y-auto">
+              <button onClick={() => setShowNewAppointmentModal(false)} className="absolute top-4 right-4 sm:top-6 sm:right-6 p-2 bg-slate-50 rounded-full"><X className="w-5 h-5 text-slate-400" /></button>
+              <h3 className="text-xl sm:text-2xl font-black text-perisur-gray mb-1 text-center">Programar Cita</h3>
+              <p className="text-xs sm:text-sm text-slate-400 mb-6 sm:mb-8 font-medium text-center italic">Seleccione fecha y hora disponible</p>
               
-              <div className="grid grid-cols-7 gap-1 mb-6 text-center">
-                 {["D", "L", "M", "M", "J", "V", "S"].map(day => <div key={day} className="text-[10px] font-black text-slate-300 py-2">{day}</div>)}
+              <div className="grid grid-cols-7 gap-1 mb-6 text-center bg-slate-50 p-4 rounded-3xl">
+                 {["D", "L", "M", "M", "J", "V", "S"].map((day, idx) => <div key={`${day}-${idx}`} className="text-[10px] font-black text-slate-300 py-2">{day}</div>)}
                  {Array.from({length: 31}).map((_, i) => (
-                   <button key={i} className={`h-10 text-[11px] font-bold rounded-xl transition-all ${i + 1 === 5 ? "bg-perisur-blue text-white shadow-md" : "hover:bg-slate-50 text-slate-600"}`}>
+                   <button 
+                    key={i} 
+                    onClick={() => setSelectedDate(i + 1)}
+                    className={`h-8 sm:h-10 text-[10px] sm:text-[11px] font-bold rounded-xl transition-all ${selectedDate === i + 1 ? "bg-perisur-blue text-white shadow-md" : "hover:bg-white text-slate-600"}`}
+                   >
                       {i + 1}
                    </button>
                  ))}
               </div>
 
-              <div className="grid grid-cols-3 gap-2 mb-8">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-8">
                  {["08:00", "09:00", "10:00", "11:00", "12:00", "13:00"].map(t => (
-                   <button key={t} className={`py-3 rounded-xl text-[10px] font-black border transition-all ${t === "09:00" ? "border-perisur-blue text-perisur-blue bg-blue-50" : "border-slate-100 text-slate-400"}`}>
+                   <button 
+                    key={t} 
+                    onClick={() => setSelectedTime(t)}
+                    className={`py-2 sm:py-3 rounded-xl text-[10px] font-black border transition-all ${selectedTime === t ? "border-perisur-blue text-perisur-blue bg-blue-50" : "border-slate-100 text-slate-400 hover:border-slate-200"}`}
+                   >
                       {t} AM
                    </button>
                  ))}
               </div>
 
-              <button onClick={() => { alert("Cita agendada para el 05 de Mayo"); setShowNewAppointmentModal(false); }} className="w-full py-4 bg-perisur-blue text-white rounded-2xl text-xs font-black uppercase shadow-lg shadow-blue-100">Confirmar Reservación</button>
+              <button 
+                onClick={() => { 
+                  if (!selectedDate || !selectedTime) {
+                    alert("Por favor seleccione fecha y hora.");
+                    return;
+                  }
+                  setIsDownloading(true);
+                  setTimeout(() => {
+                    alert(`Cita agendada con éxito para el ${selectedDate} de Mayo a las ${selectedTime} AM`); 
+                    setIsDownloading(false);
+                    setShowNewAppointmentModal(false); 
+                  }, 1500);
+                }} 
+                disabled={isDownloading}
+                className="w-full py-4 bg-perisur-blue text-white rounded-2xl text-[10px] sm:text-xs font-black uppercase shadow-lg shadow-blue-100 hover:bg-blue-700 transition-colors disabled:opacity-50"
+              >
+                {isDownloading ? "PROCESANDO..." : "Confirmar Reservación"}
+              </button>
             </motion.div>
           </div>
         )}
