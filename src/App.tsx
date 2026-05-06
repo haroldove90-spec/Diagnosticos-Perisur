@@ -324,6 +324,15 @@ export default function App() {
   const [activeModule, setActiveModule] = useState("Dashboard");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPatient, setSelectedPatient] = useState<PatientRecord | null>(null);
+  const [showRoleModal, setShowRoleModal] = useState(false);
+  const [showNewPatientModal, setShowNewPatientModal] = useState(false);
+  const [showNewAppointmentModal, setShowNewAppointmentModal] = useState(false);
+  const [paymentStep, setPaymentStep] = useState<"summary" | "processing" | "success">("summary");
+  const [invoiceStatus, setInvoiceStatus] = useState<"idle" | "generating" | "sent">("idle");
+  const [showCashLogModal, setShowCashLogModal] = useState(false);
+  const [showPOModal, setShowPOModal] = useState(false);
+  const [isSigning, setIsSigning] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Filters
@@ -435,7 +444,12 @@ export default function App() {
               <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
                 <div className="flex justify-between items-center mb-8">
                   <h3 className="text-xl font-black text-perisur-gray">Control de Asistencia y Turnos</h3>
-                  <button className="bg-perisur-blue text-white px-4 py-2 rounded-xl text-xs font-bold">Gestionar Roles</button>
+                  <button 
+                    onClick={() => setShowRoleModal(true)}
+                    className="bg-perisur-blue text-white px-4 py-2 rounded-xl text-xs font-bold hover:scale-[1.02] transition-all"
+                  >
+                    Gestionar Roles
+                  </button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {ATTENDANCE.map((p, i) => (
@@ -637,35 +651,108 @@ export default function App() {
                 <h3 className="text-xl font-black text-perisur-gray mb-8">Caja y Procesamiento de Pagos</h3>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   <div className="space-y-6">
-                    <div className="p-6 bg-slate-50 rounded-2xl">
+                    <div className="p-8 bg-slate-50 rounded-[2.5rem]">
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Total a Cobrar</p>
-                      <p className="text-4xl font-black text-perisur-gray">$1,250.00</p>
+                      <p className="text-5xl font-black text-perisur-gray">$1,250.00</p>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <button className="p-4 border-2 border-perisur-blue/20 rounded-2xl flex flex-col items-center gap-2 hover:bg-perisur-blue/5 transition-all">
-                        <CreditCard className="w-6 h-6 text-perisur-blue" />
-                        <span className="text-xs font-bold">Tarjeta</span>
-                      </button>
-                      <button className="p-4 border-2 border-perisur-blue/20 rounded-2xl flex flex-col items-center gap-2 hover:bg-perisur-blue/5 transition-all">
-                        <DollarSign className="w-6 h-6 text-perisur-blue" />
-                        <span className="text-xs font-bold">Efectivo</span>
-                      </button>
-                    </div>
+                    {paymentStep === "summary" && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <button 
+                          onClick={() => {
+                            setPaymentStep("processing");
+                            setTimeout(() => setPaymentStep("success"), 2500);
+                          }}
+                          className="p-6 border-2 border-perisur-blue/20 rounded-3xl flex flex-col items-center gap-3 hover:bg-perisur-blue/5 transition-all group"
+                        >
+                          <CreditCard className="w-8 h-8 text-perisur-blue group-hover:scale-110 transition-transform" />
+                          <span className="text-xs font-black uppercase tracking-wider">Tarjeta</span>
+                        </button>
+                        <button 
+                          onClick={() => {
+                             setPaymentStep("processing");
+                             setTimeout(() => setPaymentStep("success"), 1500);
+                          }}
+                          className="p-6 border-2 border-slate-200 rounded-3xl flex flex-col items-center gap-3 hover:bg-slate-50 transition-all group"
+                        >
+                          <DollarSign className="w-8 h-8 text-slate-400 group-hover:scale-110 transition-transform" />
+                          <span className="text-xs font-black uppercase tracking-wider">Efectivo</span>
+                        </button>
+                      </div>
+                    )}
+                    {paymentStep === "processing" && (
+                      <div className="flex flex-col items-center justify-center p-12 bg-perisur-blue/5 rounded-3xl border border-dashed border-perisur-blue/20">
+                        <motion.div 
+                          animate={{ rotate: 360 }}
+                          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                          className="mb-4"
+                        >
+                          <Activity className="w-10 h-10 text-perisur-blue" />
+                        </motion.div>
+                        <p className="text-sm font-black text-perisur-blue uppercase tracking-widest">Procesando Transacción...</p>
+                      </div>
+                    )}
+                    {paymentStep === "success" && (
+                      <motion.div 
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="flex flex-col items-center justify-center p-12 bg-green-50 rounded-3xl border border-green-100"
+                      >
+                        <CheckCircle2 className="w-12 h-12 text-green-500 mb-4" />
+                        <p className="text-sm font-black text-green-700 uppercase tracking-widest mb-6">¡Venta Exitosa!</p>
+                        <button 
+                          onClick={() => setPaymentStep("summary")}
+                          className="px-6 py-2 bg-white text-green-700 rounded-xl text-[10px] font-black uppercase shadow-sm"
+                        >
+                          Nuevo Cobro
+                        </button>
+                      </motion.div>
+                    )}
                   </div>
                   <div className="space-y-4">
                     <h4 className="text-xs font-black text-slate-300 uppercase tracking-widest">Resumen de Cotización</h4>
-                    {[
-                      { item: "Biometría Hemática", price: "$450" },
-                      { item: "Química Sanguínea (6)", price: "$800" },
-                    ].map((item, i) => (
-                      <div key={i} className="flex justify-between py-3 border-b border-slate-50">
-                        <span className="text-sm font-bold text-slate-600">{item.item}</span>
-                        <span className="text-sm font-black text-perisur-gray">{item.price}</span>
-                      </div>
-                    ))}
-                    <button className="w-full py-4 bg-perisur-blue text-white rounded-2xl text-xs font-black shadow-lg shadow-blue-100 mt-4">
-                      Emitir Factura Electrónica
-                    </button>
+                    <div className="space-y-2 bg-slate-50 p-6 rounded-3xl">
+                      {[
+                        { item: "Biometría Hemática", price: "$450" },
+                        { item: "Química Sanguínea (6)", price: "$800" },
+                      ].map((item, i) => (
+                        <div key={i} className="flex justify-between py-3 border-b border-white/50 last:border-0 text-sm">
+                          <span className="font-bold text-slate-600">{item.item}</span>
+                          <span className="font-black text-perisur-gray">{item.price}</span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="mt-8 pt-8 border-t border-slate-100">
+                      {invoiceStatus === "idle" && (
+                        <button 
+                          disabled={paymentStep !== "success"}
+                          onClick={() => {
+                            setInvoiceStatus("generating");
+                            setTimeout(() => setInvoiceStatus("sent"), 3000);
+                          }}
+                          className={`${paymentStep !== "success" ? "bg-slate-100 text-slate-400 grayscale" : "bg-perisur-blue text-white shadow-lg shadow-blue-100"} w-full py-5 rounded-2xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all hover:scale-[1.01]`}
+                        >
+                          <FileText className="w-4 h-4" /> Emitir Factura Electrónica
+                        </button>
+                      )}
+                      {invoiceStatus === "generating" && (
+                        <div className="w-full py-5 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center gap-3">
+                          <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }}><Activity className="w-4 h-4" /></motion.div>
+                          <span className="text-xs font-black uppercase tracking-widest">Generando Timbrado CFDI...</span>
+                        </div>
+                      )}
+                      {invoiceStatus === "sent" && (
+                        <motion.div 
+                          initial={{ y: 10, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          className="bg-emerald-50 p-6 rounded-3xl border border-emerald-100 text-center"
+                        >
+                          <p className="text-xs font-black text-emerald-700 uppercase tracking-widest mb-1">Factura Enviada</p>
+                          <p className="text-[10px] text-emerald-600 font-medium mb-4">PDF y XML enviados al correo del paciente.</p>
+                          <button onClick={() => setInvoiceStatus("idle")} className="text-[10px] font-black text-emerald-700 underline uppercase">Emitir otra</button>
+                        </motion.div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -680,8 +767,13 @@ export default function App() {
                 <div className="flex justify-between items-center mb-8">
                   <h3 className="text-xl font-black text-perisur-gray">Agenda de Citas y Tomas</h3>
                   <div className="flex gap-2">
-                    <button className="px-4 py-2 bg-slate-50 rounded-xl text-xs font-bold">Hoy</button>
-                    <button className="px-4 py-2 bg-perisur-blue text-white rounded-xl text-xs font-bold">Nueva Cita</button>
+                    <button className="px-5 py-2.5 bg-slate-50 rounded-xl text-[10px] font-black uppercase text-slate-400 hover:text-perisur-blue transition-colors">Hoy</button>
+                    <button 
+                      onClick={() => setShowNewAppointmentModal(true)}
+                      className="px-5 py-2.5 bg-perisur-blue text-white rounded-xl text-[10px] font-black uppercase shadow-lg shadow-blue-100 hover:scale-[1.05] transition-all flex items-center gap-2"
+                    >
+                      <Plus className="w-4 h-4" /> Nueva Cita
+                    </button>
                   </div>
                 </div>
                 <div className="space-y-4">
@@ -692,16 +784,17 @@ export default function App() {
                   ].map((cite, i) => (
                     <div key={i} className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl group hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-slate-100">
                       <div className="flex items-center gap-6">
-                        <div className="text-center w-20">
+                        <div className="text-center w-24">
                           <p className="text-sm font-black text-perisur-blue">{cite.time}</p>
+                          <p className="text-[9px] font-bold text-slate-300 uppercase">05 MAY 2026</p>
                         </div>
                         <div className="w-px h-10 bg-slate-200" />
                         <div>
                           <p className="text-sm font-black text-perisur-gray">{cite.patient}</p>
-                          <p className="text-[10px] text-slate-400 font-bold uppercase">{cite.study}</p>
+                          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{cite.study}</p>
                         </div>
                       </div>
-                      <span className={`text-[10px] font-black px-3 py-1 rounded-full ${cite.status === 'Confirmado' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
+                      <span className={`text-[10px] font-black px-4 py-1.5 rounded-full ${cite.status === 'Confirmado' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
                         {cite.status}
                       </span>
                     </div>
@@ -730,10 +823,13 @@ export default function App() {
                 </div>
                 <Calendar className="w-8 h-8 text-perisur-blue opacity-20" />
               </div>
-              <div className="bg-perisur-blue p-6 rounded-3xl shadow-lg shadow-blue-100 flex items-center justify-center gap-3 cursor-pointer hover:scale-[1.02] transition-all">
-                <Plus className="w-6 h-6 text-white" />
-                <span className="text-white font-black text-sm uppercase">Nuevo Registro</span>
-              </div>
+              <button 
+                onClick={() => setShowNewPatientModal(true)}
+                className="bg-perisur-blue p-6 rounded-3xl shadow-lg shadow-blue-100 flex items-center justify-center gap-3 cursor-pointer hover:scale-[1.02] transition-all text-white border-none"
+              >
+                <Plus className="w-6 h-6" />
+                <span className="font-black text-sm uppercase">Nuevo Registro</span>
+              </button>
             </div>
 
             <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
@@ -811,7 +907,10 @@ export default function App() {
                 </table>
               </div>
               <div className="p-6 bg-slate-50/50 flex justify-center">
-                <button className="text-xs font-black text-perisur-blue flex items-center gap-2 hover:underline">
+                <button 
+                  onClick={() => setShowCashLogModal(true)}
+                  className="text-xs font-black text-perisur-blue flex items-center gap-2 hover:underline"
+                >
                   Ver Bitácora de Caja del Día <ArrowUpRight className="w-4 h-4" />
                 </button>
               </div>
@@ -842,8 +941,25 @@ export default function App() {
                       </div>
                     </div>
                   </div>
-                  <button className="w-full py-4 bg-emerald-600 text-white rounded-2xl text-xs font-black shadow-lg shadow-emerald-100 flex items-center justify-center gap-2">
-                    Liberar Lote con mi Firma <Save className="w-4 h-4" />
+                  <button 
+                    onClick={() => {
+                      setIsSigning(true);
+                      setTimeout(() => {
+                        setIsSigning(false);
+                        alert("Lote de 12 reportes validado y firmado digitalmente.");
+                      }, 2000);
+                    }}
+                    disabled={isSigning}
+                    className="w-full py-4 bg-emerald-600 text-white rounded-2xl text-xs font-black shadow-lg shadow-emerald-100 flex items-center justify-center gap-2 overflow-hidden relative"
+                  >
+                    {isSigning ? (
+                      <>
+                        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }}><Activity className="w-4 h-4" /></motion.div>
+                        Firmando con Certificado...
+                      </>
+                    ) : (
+                      <>Liberar Lote con mi Firma <Save className="w-4 h-4" /></>
+                    )}
                   </button>
                 </div>
               </div>
@@ -924,7 +1040,7 @@ export default function App() {
             <div className="space-y-8 animate-in fade-in duration-500">
               <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
                 <h3 className="text-xl font-black text-perisur-gray mb-8">Alertas de Caducidad Crítica</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                   {EXPIRATIONS.map((e, i) => (
                     <div key={i} className={`p-6 rounded-3xl border ${e.severity === 'high' ? 'bg-red-50 border-red-100' : 'bg-slate-50 border-slate-100'}`}>
                       <div className="flex justify-between items-start mb-4">
@@ -941,6 +1057,12 @@ export default function App() {
                     </div>
                   ))}
                 </div>
+                <button 
+                  onClick={() => setShowPOModal(true)}
+                  className="w-full py-5 bg-perisur-blue text-white rounded-2xl text-xs font-black uppercase shadow-lg shadow-blue-100 flex items-center justify-center gap-3 hover:scale-[1.01] transition-all"
+                >
+                  <Plus className="w-5 h-5" /> Generar Órdenes de Compra
+                </button>
               </div>
             </div>
           );
@@ -952,7 +1074,12 @@ export default function App() {
               <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
                 <div className="flex justify-between items-center mb-8">
                   <h3 className="text-xl font-black text-perisur-gray">Directorio de Proveedores</h3>
-                  <button className="px-4 py-2 bg-perisur-blue text-white rounded-xl text-xs font-bold">Nueva Orden de Compra</button>
+                  <button 
+                    onClick={() => setShowPOModal(true)}
+                    className="px-5 py-2.5 bg-perisur-blue text-white rounded-xl text-[10px] font-black uppercase shadow-lg shadow-blue-100 hover:scale-[1.05] transition-all"
+                  >
+                    Nueva Orden de Compra
+                  </button>
                 </div>
                 <div className="space-y-4">
                   {[
@@ -1044,7 +1171,10 @@ export default function App() {
                       <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{e.date}</p>
                     </div>
                   ))}
-                  <button className="w-full py-4 bg-perisur-blue text-white rounded-2xl text-xs font-black shadow-lg shadow-blue-100 mt-4">
+                  <button 
+                    onClick={() => setShowPOModal(true)}
+                    className="w-full py-4 bg-perisur-blue text-white rounded-2xl text-xs font-black shadow-lg shadow-blue-100 mt-4"
+                  >
                     Generar Órdenes de Compra
                   </button>
                 </div>
@@ -1112,8 +1242,18 @@ export default function App() {
                     <div className="flex items-center gap-4">
                       <StatusBadge status={a.status} />
                       {a.status === "Completado" ? (
-                        <button className="px-4 py-2 bg-perisur-blue text-white rounded-xl text-[10px] font-black uppercase shadow-lg shadow-blue-50 transition-all flex items-center gap-2">
-                          Descargar PDF
+                        <button 
+                          onClick={() => {
+                            setIsDownloading(true);
+                            setTimeout(() => {
+                              setIsDownloading(false);
+                              alert("Descargando resultado: " + a.study + ".pdf");
+                            }, 2000);
+                          }}
+                          disabled={isDownloading}
+                          className="px-4 py-2 bg-perisur-blue text-white rounded-xl text-[10px] font-black uppercase shadow-lg shadow-blue-50 transition-all flex items-center gap-2"
+                        >
+                          {isDownloading ? "DESCARGANDO..." : "Descargar PDF"}
                         </button>
                       ) : (
                         <button disabled className="px-4 py-2 bg-slate-100 text-slate-400 rounded-xl text-[10px] font-black uppercase">
@@ -1381,6 +1521,164 @@ export default function App() {
       {/* Modals */}
       <AnimatePresence>
         {selectedPatient && <ChemistModal patient={selectedPatient} onClose={() => setSelectedPatient(null)} />}
+        
+        {/* Modal RRHH Roles */}
+        {showRoleModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-perisur-gray/40 backdrop-blur-sm">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-white rounded-3xl p-10 max-w-xl w-full shadow-2xl overflow-hidden relative">
+              <button onClick={() => setShowRoleModal(false)} className="absolute top-6 right-6 p-2 bg-slate-50 rounded-full hover:bg-slate-100 transition-colors"><X className="w-5 h-5 text-slate-400" /></button>
+              <h3 className="text-2xl font-black text-perisur-gray mb-2">Gestión de Roles y Permisos</h3>
+              <p className="text-sm text-slate-400 mb-8 font-medium">Asigne roles y niveles de acceso al personal clínico.</p>
+              
+              <div className="space-y-4">
+                {["ADMINISTRADOR", "RECEPCIÓN", "QUÍMICO", "INVENTARIO"].map((role) => (
+                  <div key={role} className="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-perisur-blue shadow-sm">{role === "QUÍMICO" ? <FlaskConical className="w-5 h-5" /> : <Users className="w-5 h-5" />}</div>
+                      <div>
+                        <p className="text-sm font-black text-perisur-gray uppercase tracking-wider">{role}</p>
+                        <p className="text-[10px] text-slate-400 font-bold">Acceso Total al Módulo</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                       <span className="w-12 h-6 bg-blue-100 rounded-full relative"><span className="absolute right-1 top-1 w-4 h-4 bg-perisur-blue rounded-full"></span></span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button onClick={() => { alert("Configuración de roles guardada"); setShowRoleModal(false); }} className="w-full py-4 bg-perisur-blue text-white rounded-2xl text-xs font-black uppercase shadow-lg shadow-blue-100 mt-8">Guardar Cambios</button>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Modal Nuevo Registro Reception */}
+        {showNewPatientModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-perisur-gray/40 backdrop-blur-sm">
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 30 }} className="bg-white rounded-3xl p-10 max-w-2xl w-full shadow-2xl relative">
+              <button onClick={() => setShowNewPatientModal(false)} className="absolute top-6 right-6 p-2 bg-slate-50 rounded-full"><X className="w-5 h-5" /></button>
+              <h3 className="text-2xl font-black text-perisur-gray mb-1">Nuevo Registro de Paciente</h3>
+              <p className="text-sm text-slate-400 mb-8 font-medium">Complete los datos básicos para abrir expediente.</p>
+              
+              <div className="grid grid-cols-2 gap-6 mb-8">
+                <div className="col-span-2">
+                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 mb-2 block">Nombre Completo</label>
+                  <input type="text" placeholder="Ej: Mariana Rodríguez" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-perisur-blue transition-all" />
+                </div>
+                <div>
+                   <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 mb-2 block">Edad</label>
+                   <input type="number" placeholder="25" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-perisur-blue transition-all" />
+                </div>
+                <div>
+                   <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 mb-2 block">Género</label>
+                   <select className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-perisur-blue transition-all appearance-none uppercase">
+                      <option>Femenino</option>
+                      <option>Masculino</option>
+                   </select>
+                </div>
+              </div>
+              <button onClick={() => { alert("Paciente registrado correctamente"); setShowNewPatientModal(false); }} className="w-full py-5 bg-perisur-blue text-white rounded-2xl text-xs font-black uppercase shadow-lg shadow-blue-100">Crear Expediente y Continuar</button>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Modal Nueva Cita Agenda */}
+        {showNewAppointmentModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-perisur-gray/40 backdrop-blur-sm">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-white rounded-3xl p-10 max-w-xl w-full shadow-2xl relative">
+              <button onClick={() => setShowNewAppointmentModal(false)} className="absolute top-6 right-6 p-2 bg-slate-50 rounded-full"><X className="w-5 h-5 text-slate-400" /></button>
+              <h3 className="text-2xl font-black text-perisur-gray mb-1 text-center">Programar Cita</h3>
+              <p className="text-sm text-slate-400 mb-8 font-medium text-center italic">Seleccione fecha y hora disponible</p>
+              
+              <div className="grid grid-cols-7 gap-1 mb-6 text-center">
+                 {["D", "L", "M", "M", "J", "V", "S"].map(day => <div key={day} className="text-[10px] font-black text-slate-300 py-2">{day}</div>)}
+                 {Array.from({length: 31}).map((_, i) => (
+                   <button key={i} className={`h-10 text-[11px] font-bold rounded-xl transition-all ${i + 1 === 5 ? "bg-perisur-blue text-white shadow-md" : "hover:bg-slate-50 text-slate-600"}`}>
+                      {i + 1}
+                   </button>
+                 ))}
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 mb-8">
+                 {["08:00", "09:00", "10:00", "11:00", "12:00", "13:00"].map(t => (
+                   <button key={t} className={`py-3 rounded-xl text-[10px] font-black border transition-all ${t === "09:00" ? "border-perisur-blue text-perisur-blue bg-blue-50" : "border-slate-100 text-slate-400"}`}>
+                      {t} AM
+                   </button>
+                 ))}
+              </div>
+
+              <button onClick={() => { alert("Cita agendada para el 05 de Mayo"); setShowNewAppointmentModal(false); }} className="w-full py-4 bg-perisur-blue text-white rounded-2xl text-xs font-black uppercase shadow-lg shadow-blue-100">Confirmar Reservación</button>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Modal Bitácora de Caja */}
+        {showCashLogModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-perisur-gray/40 backdrop-blur-sm">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-white rounded-3xl p-10 max-w-2xl w-full shadow-2xl relative">
+              <button onClick={() => setShowCashLogModal(false)} className="absolute top-6 right-6 p-2 bg-slate-50 rounded-full"><X className="w-5 h-5 text-slate-400" /></button>
+              <h3 className="text-2xl font-black text-perisur-gray mb-1">Bitácora de Caja del Día</h3>
+              <p className="text-sm text-slate-400 mb-8 font-medium italic">Resumen de transacciones del turno actual</p>
+              
+              <div className="space-y-3 mb-8 max-h-96 overflow-y-auto pr-2">
+                {[
+                  { time: "08:12 AM", concept: "Venta: PX-001 - Juan Pérez", amount: "$450.00", method: "Tarjeta" },
+                  { time: "09:30 AM", concept: "Venta: PX-002 - María Elena", amount: "$1,200.00", method: "Efectivo" },
+                  { time: "10:15 AM", concept: "Venta: PX-004 - Sofía López", amount: "$800.00", method: "Tarjeta" },
+                  { time: "11:45 AM", concept: "Apertura de Caja", amount: "$3,000.00", method: "Base" },
+                ].map((log, i) => (
+                  <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div>
+                       <p className="text-[10px] font-black text-perisur-blue mb-1">{log.time} • {log.method}</p>
+                       <p className="text-sm font-bold text-perisur-gray">{log.concept}</p>
+                    </div>
+                    <p className="text-sm font-black text-perisur-gray">{log.amount}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="p-6 bg-perisur-blue/5 rounded-3xl flex justify-between items-center">
+                 <p className="text-xs font-black text-perisur-blue uppercase tracking-widest">Total en Caja</p>
+                 <p className="text-2xl font-black text-perisur-blue">$5,450.00</p>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Modal Orden de Compra Inventory */}
+        {showPOModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-perisur-gray/40 backdrop-blur-sm">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-white rounded-3xl p-10 max-w-2xl w-full shadow-2xl relative">
+              <button onClick={() => setShowPOModal(false)} className="absolute top-6 right-6 p-2 bg-slate-50 rounded-full"><X className="w-5 h-5 text-slate-400" /></button>
+              <h3 className="text-2xl font-black text-perisur-gray mb-1">Nueva Orden de Compra</h3>
+              <p className="text-sm text-slate-400 mb-8 font-medium">Genere una solicitud de abastecimiento para proveedores.</p>
+              
+              <div className="space-y-6 mb-8">
+                <div>
+                   <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 mb-2 block">Proveedor</label>
+                   <select className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-perisur-blue transition-all">
+                      <option>Sistemas Diagnósticos MX</option>
+                      <option>Equipos Médicos Perisur</option>
+                   </select>
+                </div>
+                <div className="p-6 border-2 border-dashed border-slate-100 rounded-3xl">
+                   <p className="text-[10px] font-black text-slate-300 uppercase text-center mb-4">Ítems Críticos Recomendados</p>
+                   <div className="space-y-2">
+                     <div className="flex justify-between items-center text-xs font-bold text-slate-600">
+                        <span>Tiras Reactivas Glucosa</span>
+                        <input type="number" defaultValue={50} className="w-16 bg-slate-100 border-none rounded-lg px-2 py-1 text-center" />
+                     </div>
+                     <div className="flex justify-between items-center text-xs font-bold text-slate-600">
+                        <span>Reactivo Biometría A</span>
+                        <input type="number" defaultValue={20} className="w-16 bg-slate-100 border-none rounded-lg px-2 py-1 text-center" />
+                     </div>
+                   </div>
+                </div>
+              </div>
+
+              <button onClick={() => { alert("Orden de compra generada y enviada al proveedor"); setShowPOModal(false); }} className="w-full py-5 bg-perisur-blue text-white rounded-2xl text-xs font-black uppercase shadow-lg shadow-blue-100">Emitir Orden de Compra</button>
+            </motion.div>
+          </div>
+        )}
       </AnimatePresence>
     </div>
   );
