@@ -351,6 +351,9 @@ export default function App() {
   const [isSigning, setIsSigning] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showNewMaquilaModal, setShowNewMaquilaModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<number | null>(5);
+  const [selectedTime, setSelectedTime] = useState<string | null>("09:00");
 
   // Filters
   const filteredPatients = useMemo(() => {
@@ -490,11 +493,11 @@ export default function App() {
                 <div className="overflow-x-auto -mx-8 px-8">
                   <div className="min-w-[600px] space-y-4">
                     {[
-                      { user: "Jesús Armengol", action: "Modificó resultado Glucosa", patient: "PX-001", time: "14:22:10", ip: "189.210.34.12", risk: "low" },
-                      { user: "María Ortiz", action: "Eliminó registro de pago", patient: "PX-005", time: "13:45:05", ip: "189.210.34.15", risk: "high" },
-                      { user: "Carlos Pérez", action: "Liberó firma digital lote #44", patient: "N/A", time: "12:30:12", ip: "189.210.34.18", risk: "low" },
-                    ].map((log, i) => (
-                      <div key={i} className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl">
+                      { id: 1, user: "Jesús Armengol", action: "Modificó resultado Glucosa", patient: "PX-001", time: "14:22:10", ip: "189.210.34.12", risk: "low" },
+                      { id: 2, user: "María Ortiz", action: "Eliminó registro de pago", patient: "PX-005", time: "13:45:05", ip: "189.210.34.15", risk: "high" },
+                      { id: 3, user: "Carlos Pérez", action: "Liberó firma digital lote #44", patient: "N/A", time: "12:30:12", ip: "189.210.34.18", risk: "low" },
+                    ].map((log) => (
+                      <div key={log.id} className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl">
                         <div className="flex items-center gap-6">
                           <div className={`w-1 h-10 rounded-full ${log.risk === 'high' ? 'bg-red-500' : 'bg-green-500'}`} />
                           <div>
@@ -525,18 +528,27 @@ export default function App() {
                     <div className="p-6 bg-perisur-blue/5 rounded-3xl border border-perisur-blue/10">
                       <p className="text-[10px] font-black text-perisur-blue uppercase mb-2">Campaña Activa</p>
                       <h4 className="text-lg font-black text-perisur-gray mb-4">Check-up Primaveral</h4>
-                      <div className="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100">
+                      <div className="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 mb-4">
                         <p className="text-xs font-bold text-slate-500">20% Descuento en Perfil Bio</p>
                         <span className="text-[10px] font-black text-perisur-blue">84 Canjeados</span>
                       </div>
+                      <button 
+                        onClick={() => alert("¡Campaña recordatoria enviada a 1,240 pacientes registrados!")}
+                        className="w-full py-3 bg-perisur-blue text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-50"
+                      >
+                        Activar Campaña Email/SMS
+                      </button>
                     </div>
                     <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
                       <p className="text-[10px] font-black text-slate-400 uppercase mb-4">Pacientes Frecuentes (VIP)</p>
-                      <div className="flex items-center gap-3">
-                        <div className="flex -space-x-3">
-                          {[1,2,3,4].map(i => <div key={i} className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white" />)}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="flex -space-x-3">
+                            {[1, 2, 3, 4].map(i => <div key={i} className="w-8 h-8 rounded-full bg-slate-300 border-2 border-white flex items-center justify-center text-[8px] font-bold text-white">{i}</div>)}
+                          </div>
+                          <p className="text-xs font-bold text-slate-400">+128 pacientes Premium</p>
                         </div>
-                        <p className="text-xs font-bold text-slate-400">+128 pacientes Premium</p>
+                        <button className="p-2 bg-white rounded-lg text-perisur-blue border border-blue-50"><Gift className="w-4 h-4" /></button>
                       </div>
                     </div>
                   </div>
@@ -604,8 +616,8 @@ export default function App() {
                   </button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {ATTENDANCE.map((p, i) => (
-                    <div key={i} className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl border border-transparent hover:border-slate-100 transition-all">
+                  {ATTENDANCE.map((p) => (
+                    <div key={p.staff} className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl border border-transparent hover:border-slate-100 transition-all">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-perisur-blue font-black border border-slate-100">
                           {p.staff.charAt(0)}
@@ -699,8 +711,8 @@ export default function App() {
               {/* Main Analytics Chart */}
               <div className="lg:col-span-2 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
                 <h3 className="text-lg font-black text-perisur-gray mb-6">Rendimiento Financiero Semanal</h3>
-                <div className="h-72">
-                  <ResponsiveContainer width="100%" height="100%">
+                <div className="h-72 min-h-[288px]">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <BarChart data={CHART_DATA}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                       <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: "#94a3b8", fontSize: 10}} />
@@ -741,8 +753,8 @@ export default function App() {
               <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
                 <h3 className="text-lg font-black text-perisur-gray mb-6">Asistencia de Personal</h3>
                 <div className="space-y-4">
-                  {ATTENDANCE.map((p, i) => (
-                    <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+                  {ATTENDANCE.map((p) => (
+                    <div key={p.staff} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-perisur-blue font-bold">
                           {p.staff.charAt(0)}
@@ -813,7 +825,7 @@ export default function App() {
                           <span className="text-[10px] font-black uppercase text-green-600 bg-green-100 px-2 py-0.5 rounded">Listo</span>
                         </div>
                         <p className="text-[10px] text-slate-400 font-bold uppercase mb-4">{notif.study}</p>
-                        <div className="flex gap-4">
+                        <div className="flex gap-2 flex-wrap sm:gap-4">
                           <button 
                             disabled={isDownloading}
                             onClick={() => {
@@ -840,6 +852,19 @@ export default function App() {
                           >
                              <Mail className="w-3.5 h-3.5" /> {isDownloading ? "Enviando..." : "E-mail"}
                           </button>
+                          <button 
+                            disabled={isDownloading}
+                            onClick={() => {
+                              setIsDownloading(true);
+                              setTimeout(() => {
+                                setIsDownloading(false);
+                                alert("SMS enviado con éxito a " + notif.phone);
+                              }, 1200);
+                            }}
+                            className="flex items-center gap-2 text-[10px] font-black text-slate-600 bg-slate-100 px-3 py-2 rounded-xl hover:bg-slate-200 transition-all disabled:opacity-50"
+                          >
+                             <Bell className="w-3.5 h-3.5" /> {isDownloading ? "Enviando..." : "SMS"}
+                          </button>
                         </div>
                       </div>
                       <div className="text-right">
@@ -857,7 +882,7 @@ export default function App() {
         if (activeModule === "Maquila") {
           return (
             <div className="space-y-8 animate-in fade-in duration-500">
-              <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+            <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
                 <div className="flex justify-between items-center mb-8">
                   <h3 className="text-xl font-black text-perisur-gray">Gestión de Maquila</h3>
                   <button 
@@ -867,27 +892,29 @@ export default function App() {
                     <Plus className="w-4 h-4" /> Nueva Salida
                   </button>
                 </div>
-                <div className="space-y-4">
-                  {[
-                    { lab: "Laboratorios Centralizados", study: "TAMIZ METABOLICO", tracking: "TRK-847291-A", date: "Hoy 14:00" },
-                    { lab: "Genética Especializada", study: "ESTUDIO CITOGENETICO", tracking: "TRK-229381-C", date: "Ayer 10:30" },
-                  ].map((m, i) => (
-                    <div key={i} className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-perisur-blue shadow-sm">
-                          <Truck className="w-6 h-6" />
+                <div className="overflow-x-auto -mx-8 px-8">
+                  <div className="min-w-[500px] space-y-4 px-1 pb-4">
+                    {[
+                      { lab: "Laboratorios Centralizados", study: "TAMIZ METABOLICO", tracking: "TRK-847291-A", date: "Hoy 14:00" },
+                      { lab: "Genética Especializada", study: "ESTUDIO CITOGENETICO", tracking: "TRK-229381-C", date: "Ayer 10:30" },
+                    ].map((m, i) => (
+                      <div key={i} className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-perisur-blue shadow-sm">
+                            <Truck className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-black text-perisur-gray">{m.lab}</p>
+                            <p className="text-[10px] text-slate-400 font-bold uppercase">{m.study}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-sm font-black text-perisur-gray">{m.lab}</p>
-                          <p className="text-[10px] text-slate-400 font-bold uppercase">{m.study}</p>
+                        <div className="text-right">
+                          <p className="text-[10px] font-black text-perisur-blue mb-1">{m.tracking}</p>
+                          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Recolectado: {m.date}</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-[10px] font-black text-perisur-blue mb-1">{m.tracking}</p>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Recolectado: {m.date}</p>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -903,20 +930,39 @@ export default function App() {
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black text-perisur-gray mb-4">Encuesta de Satisfacción</h3>
                 <p className="text-xs sm:text-sm text-slate-400 mb-10 font-bold uppercase tracking-widest">¿Cómo calificaría su atención hoy?</p>
-                <div className="flex justify-center gap-2 sm:gap-4 mb-10">
-                  {[1, 2, 3, 4, 5].map(star => (
-                    <button key={star} className="p-3 sm:p-6 bg-slate-50 rounded-2xl sm:rounded-3xl hover:bg-perisur-blue hover:text-white group transition-all border border-transparent hover:border-blue-100">
-                       <Star className="w-6 h-6 sm:w-10 sm:h-10 group-hover:fill-white text-perisur-blue transition-colors" />
-                       <span className="block mt-2 text-[10px] sm:text-xs font-black">{star}</span>
+                
+                {isDownloading ? (
+                  <motion.div 
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    className="p-10 bg-green-50 rounded-3xl border border-green-100 mb-10"
+                  >
+                    <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-4" />
+                    <p className="text-sm font-black text-green-700 uppercase tracking-widest">¡Gracias por su opinión!</p>
+                    <button onClick={() => setIsDownloading(false)} className="mt-4 text-[10px] font-black text-green-600 underline uppercase">Calificar de nuevo</button>
+                  </motion.div>
+                ) : (
+                  <>
+                    <div className="flex justify-center gap-2 sm:gap-4 mb-10 overflow-x-auto pb-4 px-2">
+                      {[1, 2, 3, 4, 5].map(star => (
+                        <button key={star} className="p-3 sm:p-6 bg-slate-50 rounded-2xl sm:rounded-3xl hover:bg-perisur-blue hover:text-white group transition-all border border-transparent hover:border-blue-100 flex-shrink-0">
+                          <Star className="w-6 h-6 sm:w-10 sm:h-10 group-hover:fill-white text-perisur-blue transition-colors" />
+                          <span className="block mt-2 text-[10px] sm:text-xs font-black">{star}</span>
+                        </button>
+                      ))}
+                    </div>
+                    <button 
+                      onClick={() => {
+                        setIsDownloading(true);
+                        setTimeout(() => {
+                          // Simulation end
+                        }, 2000);
+                      }}
+                      className="w-full py-4 sm:py-5 bg-perisur-gray text-white rounded-[2rem] text-[10px] sm:text-xs font-black uppercase tracking-widest shadow-xl shadow-slate-100"
+                    >
+                      Finalizar Atención
                     </button>
-                  ))}
-                </div>
-                <button 
-                  onClick={() => alert("¡Gracias por su opinión! Hemos registrado su calificación.")}
-                  className="w-full py-4 sm:py-5 bg-perisur-gray text-white rounded-[2rem] text-[10px] sm:text-xs font-black uppercase tracking-widest shadow-xl shadow-slate-100"
-                >
-                  Finalizar Atención
-                </button>
+                  </>
+                )}
               </div>
 
               <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm max-w-4xl mx-auto">
@@ -1228,8 +1274,8 @@ export default function App() {
             <div className="space-y-8 animate-in fade-in duration-500">
                <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
                 <h3 className="text-xl font-black text-perisur-gray mb-10">Control de Calidad Diario (QC)</h3>
-                <div className="h-64 mb-10 border-b border-slate-50">
-                   <ResponsiveContainer width="100%" height="100%">
+                <div className="h-64 mb-10 border-b border-slate-50 min-h-[256px]">
+                   <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <LineChart data={[
                       { x: 1, val: 98 }, { x: 2, val: 102 }, { x: 3, val: 95 }, 
                       { x: 4, val: 105 }, { x: 5, val: 110 }, { x: 6, val: 97 }, 
@@ -1264,10 +1310,17 @@ export default function App() {
                   ))}
                 </div>
                 <button 
-                  onClick={() => alert("Registrando corrida de calidad... Los resultados se reflejarán en las gráficas de Levey-Jennings.")}
-                  className="w-full py-4 mt-8 bg-perisur-blue text-white rounded-2xl text-xs font-black uppercase hover:bg-blue-700 transition-all"
+                  disabled={isDownloading}
+                  onClick={() => {
+                    setIsDownloading(true);
+                    setTimeout(() => {
+                      setIsDownloading(false);
+                      alert("¡Corrida de calidad registrada! Calibración OK. Los resultados se han reflejado en las gráficas de Levey-Jennings.");
+                    }, 2000);
+                  }}
+                  className="w-full py-4 mt-8 bg-perisur-blue text-white rounded-2xl text-xs font-black uppercase hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 disabled:opacity-50"
                 >
-                  Registrar Corrida de Calidad
+                  {isDownloading ? "Capturando Datos de Equipo..." : "Registrar Corrida de Calidad"}
                 </button>
               </div>
             </div>
@@ -1393,14 +1446,14 @@ export default function App() {
 
         return (
           <div className="space-y-6 animate-in slide-in-from-bottom-2 duration-500">
-            <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 overflow-hidden">
               <div>
                 <h2 className="text-xl font-black text-perisur-gray">Lista de Trabajo (Worklist)</h2>
                 <p className="text-sm text-slate-400">Priorización de muestras y captura técnica</p>
               </div>
-              <div className="flex bg-slate-50 p-1 rounded-xl">
+              <div className="flex bg-slate-50 p-1 rounded-xl overflow-x-auto">
                 {["Todas", "Urgentes", "Rutina"].map(t => (
-                  <button key={t} className={`px-4 py-2 rounded-lg text-xs font-bold ${t === "Todas" ? "bg-white shadow-sm text-perisur-blue" : "text-slate-400"}`}>
+                  <button key={t} className={`px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap ${t === "Todas" ? "bg-white shadow-sm text-perisur-blue" : "text-slate-400"}`}>
                     {t}
                   </button>
                 ))}
@@ -1408,50 +1461,57 @@ export default function App() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-4">
-                {INITIAL_RECORDS.filter(p => p.status !== "Completado").map(p => (
-                  <div key={p.id} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-2xl ${p.study.includes("Glucosa") ? "bg-red-50 text-red-600" : "bg-blue-50 text-perisur-blue"}`}>
-                        <Beaker className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="font-black text-perisur-gray">{p.name}</p>
-                          {p.study.includes("Glucosa") && <span className="text-[10px] font-black bg-red-100 text-red-700 px-2 py-0.5 rounded">URGENTE</span>}
+              <div className="lg:col-span-2 space-y-4 overflow-hidden">
+                <div className="overflow-x-auto -mx-4 px-4 pb-4">
+                  <div className="min-w-[400px] space-y-4">
+                    {INITIAL_RECORDS.filter(p => p.status !== "Completado").map(p => (
+                      <div key={p.id} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                          <div className={`p-3 rounded-2xl ${p.study.includes("Glucosa") ? "bg-red-50 text-red-600" : "bg-blue-50 text-perisur-blue"}`}>
+                            <Beaker className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <p className="font-black text-perisur-gray">{p.name}</p>
+                              {p.study.includes("Glucosa") && <span className="text-[10px] font-black bg-red-100 text-red-700 px-2 py-0.5 rounded">URGENTE</span>}
+                            </div>
+                            <p className="text-xs text-slate-400">{p.study} • {p.id}</p>
+                          </div>
                         </div>
-                        <p className="text-xs text-slate-400">{p.study} • {p.id}</p>
+                        <div className="flex items-center gap-3">
+                          <StatusBadge status={p.status} />
+                          <button 
+                            onClick={() => setSelectedPatient(p)}
+                            className="px-4 py-2 bg-perisur-blue text-white rounded-xl text-xs font-bold hover:shadow-lg transition-all flex items-center gap-2"
+                          >
+                            Validar <CheckCircle2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <StatusBadge status={p.status} />
-                      <button 
-                        onClick={() => setSelectedPatient(p)}
-                        className="px-4 py-2 bg-perisur-blue text-white rounded-xl text-xs font-bold hover:shadow-lg transition-all flex items-center gap-2"
-                      >
-                        Validar <CheckCircle2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
               <div className="space-y-6">
                 <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
                   <h3 className="text-lg font-black text-perisur-gray mb-6">Acciones Rápidas</h3>
-                  <div className="space-y-3">
-                    <button className="w-full flex items-center justify-between p-4 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors">
-                      <span className="text-xs font-bold">Imprimir Etiquetas (QR)</span>
-                      <ChevronRight className="w-4 h-4 text-slate-300" />
+                  <div className="grid grid-cols-2 gap-2">
+                    <button 
+                      onClick={() => alert("Generando etiquetas QR para el lote seleccionado...")}
+                      className="w-full flex items-center justify-between p-4 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors"
+                    >
+                      <span className="text-[10px] font-black uppercase">Imprimir Etiquetas (QR)</span>
+                      <QrCode className="w-4 h-4 text-perisur-blue" />
                     </button>
                     <button className="w-full flex items-center justify-between p-4 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors">
-                      <span className="text-xs font-bold">Cargar Lote de Equipo</span>
+                      <span className="text-[10px] font-black uppercase font-bold">Cargar Lote de Equipo</span>
                       <ChevronRight className="w-4 h-4 text-slate-300" />
-                    </button>
-                    <button className="w-full flex items-center justify-between p-4 bg-perisur-blue/5 text-perisur-blue rounded-2xl border border-perisur-blue/20">
-                      <span className="text-xs font-black">Liberación por Firma Digital</span>
-                      <Save className="w-4 h-4" />
                     </button>
                   </div>
+                  <button className="w-full flex items-center justify-center gap-2 p-4 bg-perisur-blue/5 text-perisur-blue rounded-2xl border border-perisur-blue/20 hover:bg-perisur-blue hover:text-white transition-all group">
+                    <span className="text-xs font-black uppercase tracking-widest">Liberación por Firma Digital</span>
+                    <Save className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  </button>
                 </div>
               </div>
             </div>
@@ -1874,7 +1934,7 @@ export default function App() {
                <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
                 <h3 className="text-xl font-black text-perisur-gray mb-8">Nueva Solicitud de Laboratorio Digital</h3>
                 <div className="space-y-6">
-                   <div className="grid grid-cols-2 gap-6">
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div>
                          <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 mb-2 block">Nombre del Paciente</label>
                          <input type="text" placeholder="Ej: Pedro Infante" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold" />
@@ -1886,17 +1946,24 @@ export default function App() {
                    </div>
                    <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Estudios Solicitados</p>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {["QUIMICA 6", "BIOMETRIA", "EGO", "PERFIL LIPIDOS", "COPRO", "ANTIGENO PSA"].map(study => (
                           <button key={study} className="p-3 bg-white border border-slate-200 rounded-xl text-[9px] font-black hover:border-perisur-blue hover:text-perisur-blue transition-all uppercase">{study}</button>
                         ))}
                       </div>
                    </div>
                    <button 
-                     onClick={() => alert("Solicitud digital enviada. El paciente puede acudir a cualquier sucursal Perisur.")}
-                     className="w-full py-5 bg-perisur-blue text-white rounded-3xl text-sm font-black uppercase tracking-widest shadow-xl shadow-blue-100"
+                     disabled={isDownloading}
+                     onClick={() => {
+                       setIsDownloading(true);
+                       setTimeout(() => {
+                         setIsDownloading(false);
+                         alert("¡Orden Electrónica generada! Se ha enviado una copia al paciente y se ha descargado el PDF administrativo.");
+                       }, 2000);
+                     }}
+                     className="w-full py-5 bg-perisur-blue text-white rounded-3xl text-sm font-black uppercase tracking-widest shadow-xl shadow-blue-100 disabled:opacity-50"
                    >
-                     Generar Orden Electrónica <FileSignature className="w-4 h-4 ml-2 inline-block" />
+                     {isDownloading ? "Generando PDF y Firmando..." : <>Generar Orden Electrónica <FileSignature className="w-4 h-4 ml-2 inline-block" /></>}
                    </button>
                 </div>
               </div>
@@ -2064,36 +2131,36 @@ export default function App() {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        <header className="h-20 sm:h-24 bg-white/80 backdrop-blur-md border-b border-slate-100 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-10">
-          <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
-            <button className="lg:hidden p-2 sm:p-3 bg-slate-50 rounded-xl" onClick={() => setIsMobileMenuOpen(true)}>
+        <header className="h-20 sm:h-24 bg-white/80 backdrop-blur-md border-b border-slate-100 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-10 w-full overflow-hidden">
+          <div className="flex items-center gap-2 sm:gap-4 overflow-hidden min-w-0">
+            <button className="lg:hidden p-2 sm:p-3 bg-slate-50 rounded-xl flex-shrink-0" onClick={() => setIsMobileMenuOpen(true)}>
               <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-perisur-blue" />
             </button>
             <div className="lg:hidden flex items-center flex-shrink-0">
-              <img src="https://cossma.com.mx/diagnosticos.png" alt="Logo" className="h-8 sm:h-10 object-contain mr-2" />
+              <img src="https://cossma.com.mx/diagnosticos.png" alt="Logo" className="h-6 sm:h-10 object-contain mr-1" />
             </div>
             <div className="overflow-hidden">
-              <h2 className="text-sm sm:text-xl font-black text-perisur-gray uppercase tracking-tight truncate">{currentRole as string}</h2>
-              <div className="flex items-center gap-1 sm:gap-2 text-[8px] sm:text-[10px] font-bold text-slate-300 uppercase tracking-widest mt-0.5 sm:mt-1">
+              <h2 className="text-xs sm:text-xl font-black text-perisur-gray uppercase tracking-tight truncate max-w-[120px] sm:max-w-none">{currentRole as string}</h2>
+              <div className="flex items-center gap-1 sm:gap-2 text-[7px] sm:text-[10px] font-bold text-slate-300 uppercase tracking-widest mt-0.5 truncate">
                 <span className="hidden xs:inline">Perisur</span>
                 <ChevronRight className="w-2 sm:w-2.5 h-2 sm:h-2.5 hidden xs:inline" />
-                <span className="text-perisur-blue">{(currentRole as string).charAt(0) + (currentRole as string).slice(1).toLowerCase()}</span>
+                <span className="text-perisur-blue truncate">{(currentRole as string).charAt(0) + (currentRole as string).slice(1).toLowerCase()}</span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-1 sm:gap-4 flex-shrink-0">
             <button className="p-2 sm:p-3 hover:bg-slate-50 rounded-2xl relative text-slate-400 hover:text-perisur-blue transition-all">
               <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="absolute top-2.5 sm:top-3 right-2.5 sm:right-3 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-red-500 rounded-full border-2 sm:border-4 border-white shadow-sm"></span>
             </button>
-            <div className="h-8 sm:h-10 w-px bg-slate-100" />
+            <div className="h-6 sm:h-10 w-px bg-slate-100 mx-0.5 sm:mx-1" />
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="text-right hidden md:block">
                 <p className="text-sm font-black text-slate-900 leading-none">Jesús Armengol</p>
                 <p className="text-[10px] font-black text-perisur-blue uppercase tracking-wider mt-1">{currentRole as string}</p>
               </div>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-blue-500 to-perisur-blue flex items-center justify-center text-white font-black shadow-lg shadow-blue-100 flex-shrink-0">
+              <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-blue-500 to-perisur-blue flex items-center justify-center text-white font-black shadow-lg shadow-blue-100 flex-shrink-0 text-xs sm:text-base">
                 JA
               </div>
             </div>
